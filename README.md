@@ -1,6 +1,6 @@
 # dotfiles
 
-My actual configuration in order to get easily up and running when setting up a new machine.
+My current configuration in order to get easily up and running when setting up a new machine.
 
 - .zshrc
 - init.vim for neovim
