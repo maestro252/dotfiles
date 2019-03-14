@@ -5,11 +5,12 @@
 " Plugins will be downloaded under the specified directory.
 
 call plug#begin('~/.config/nvim/plugged')
-
 " Declare the list of plugins.
-Plug 'godlygeek/tabular'
-Plug 'plasticboy/vim-markdown'
-Plug 'flazz/vim-colorschemes'
+Plug 'tpope/vim-surround' " Surround text easily.
+Plug 'godlygeek/tabular' " allign text
+Plug 'plasticboy/vim-markdown' " Automatically fold using tabular in md
+Plug 'flazz/vim-colorschemes' " Huge set of colorschemes
+Plug 'sickill/vim-monokai'
 Plug 'tpope/vim-sensible' "Defaults
 Plug 'joshdick/onedark.vim' "Theme
 Plug 'altercation/vim-colors-solarized' "Theme
@@ -25,11 +26,6 @@ Plug 'sickill/vim-pasta' "Context aware pasting
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'airblade/vim-gitgutter' "Gitgutter
-" Plug 'tpope/vim-fugitive' Learn later
-" Plug 'tpope/vim-rhubarb' Learn later
-Plug 'w0rp/ale' "Linting
-Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx', 'html'] }
-Plug 'moll/vim-node', { 'for': 'javascript' }
 Plug 'rakr/vim-one' " Theme
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } " Autocompletion
 Plug 'Shougo/neco-syntax' " Completion for many languages
@@ -38,11 +34,11 @@ Plug 'eagletmt/neco-ghc' " Completion for Haskell
 Plug 'wokalski/autocomplete-flow' " Completion for JavaScript
 Plug 'Shougo/neosnippet' " Snippet suppurt with deoplete
 Plug 'Shougo/neosnippet-snippets' " Default snippets
-Plug 'zchee/deoplete-jedi' " Python Completion
-"This one always have to be the last one
 Plug 'ryanoasis/vim-devicons'
 Plug 'nathanaelkane/vim-indent-guides'
-" List ends here. Plugins become visible to Vim after this call.
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'zchee/deoplete-jedi' " Python Completion, must always be at the end
 call plug#end()
 
 " --- End of plugins config
@@ -57,14 +53,15 @@ set magic      "for regex
 set noerrorbells "No auditive cue when mistakes
 set visualbell   "Set visual cue when mistakes
 set tabstop=4
-set softtabstop=0 noexpandtab
+set softtabstop=0
+set noexpandtab
 set shiftwidth=4
+set textwidth=80
 " Appearance
 set number relativenumber "Hybrid numbering
 set wrap                  "Turn on line wrapping
 set wrapmargin=8          "8 characters to the right when wrapping
 set linebreak             "set soft wrapping
-set showbreak=...         "Show ... when wrapping
 set autoindent            "autoindent new lines
 set laststatus=2          "show status line all the time
 set so=7                  "7 lines to cursor when moving vertical
@@ -77,16 +74,22 @@ set wildmode=list:longest "complete filenames like shell
 set showmatch             "show matching brackets
 "show invisibles
 set list
-set listchars=tab:→\ ,eol:¬,trail:⋅,extends:❯,precedes:❮
+set listchars=tab:▶\ ,trail:⋅,extends:❯,precedes:❮
 set showbreak=↪
+" setting clipboard
+set clipboard=unnamed
+vnoremap <C-c> "*y
+" Set terminal mode
+tnoremap <Esc> <C-\><C-n>
+
 "Terminal colors and cholorscheme
 set encoding=utf-8
 syntax on
 set t_Co=256
 set background=dark
 let g:solarized_termtrans = 1
-"set termguicolors
-colorscheme solarized
+set termguicolors
+colorscheme gruvbox
 highlight Comment cterm=italic
 highlight htmlArg cterm=italic
 highlight xmlAttrib cterm=italic
@@ -95,9 +98,7 @@ highlight Type cterm=italic
 "Config airline
 let g:airline_powerline_symbols='unicode'
 let g:airline_powerline_fonts = 1
-"let g:airline_theme='powerlineish'
-let g:airline_theme='luna'
-let g:airline_solarized_bg='dark'
+let g:airline_theme='bubblegum'
 let g:airline#extensions#tabline#show_splits = 0
 let g:airline#extensions#whitespace#enabled = 0
 let g:airline#extensions#tabline#enabled = 1
@@ -128,11 +129,7 @@ let g:NERDTreeIndicatorMapCustom = {
 \ 'Ignored'   : '☒',
 \ "Unknown"   : "?"
 \ }
-"Setup ALE for linting
-let g:ale_change_sign_column_color = 0
-let g:ale_sign_column_always = 1
-let g:ale_sign_error = '✖'
-let g:ale_sign_warning = '⚠'
+
 "Config snippets
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
@@ -145,7 +142,7 @@ let g:neosnippet#enable_completed_snippet = 1
 imap <C-k>     <Plug>(neosnippet_expand_or_jump)
 smap <C-k>     <Plug>(neosnippet_expand_or_jump)
 xmap <C-k>     <Plug>(neosnippet_expand_target)
-set ts=2 sw=2 et
+set ts=2 sw=2
 let g:indent_guide_start_level = 2
 " Change highlight in solarized
 highlight Visual cterm=NONE ctermbg=0 ctermfg=NONE guibg=Grey40
