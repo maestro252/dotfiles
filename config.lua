@@ -16,7 +16,18 @@ banner_jony = { -- banner to add in lvims dashboard file
 
 -- {{ Plugins }}
 lvim.plugins = {
+  {
+    'gorbit99/codewindow.nvim',
+    config = function()
+      local codewindow = require('codewindow')
+      codewindow.setup()
+      codewindow.apply_default_keybinds()
+    end,
+  },
   -- Colorschemes
+  {
+    "Mofiqul/vscode.nvim"
+  },
   {
     "neanias/everforest-nvim",
     version = false,
@@ -24,11 +35,14 @@ lvim.plugins = {
     priority = 1000, -- make sure to load this before all the other start plugins
   },
   { "catppuccin/nvim",            name = "catppuccin", priority = 1000 },
-  { "rebelot/kanagawa.nvim" },
-  { "kepano/flexoki" },
+  -- { 'rafi/awesome-vim-colorschemes' },
+  { 'oxfist/night-owl.nvim' },
+  -- { 'ribru17/bamboo.nvim' },
+  { 'rebelot/kanagawa.nvim' },
   { 'folke/lsp-colors.nvim' },
   { 'Shatur/neovim-ayu' },
-  { "joshdick/onedark.vim" },
+  -- { "joshdick/onedark.vim" },
+  { 'navarasu/onedark.nvim' },
   { "sainnhe/sonokai" },
   { "Mofiqul/dracula.nvim" },
   { "projekt0n/github-nvim-theme" },
@@ -40,9 +54,87 @@ lvim.plugins = {
     priority = 1000,
     opts = {},
   },
-  { 'morhetz/gruvbox' },
+  { 'sainnhe/gruvbox-material' },
   { 'EdenEast/nightfox.nvim' },
   { 'ishan9299/nvim-solarized-lua' },
+  -- tmux navigator
+  {
+    "christoomey/vim-tmux-navigator",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+    keys = {
+      { "<c-h>",  "<cmd><C-U>TmuxNavigateLeft<cr>" },
+      { "<c-j>",  "<cmd><C-U>TmuxNavigateDown<cr>" },
+      { "<c-k>",  "<cmd><C-U>TmuxNavigateUp<cr>" },
+      { "<c-l>",  "<cmd><C-U>TmuxNavigateRight<cr>" },
+      { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
+    },
+  },
+  -- Restore nvim session on tmux session resurrect
+  {
+    'rmagatti/auto-session',
+    lazy = false,
+
+    ---enables autocomplete for opts
+    ---@module "auto-session"
+    ---@type AutoSession.Config
+    opts = {
+      suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
+      -- log_level = 'debug',
+    }
+  },
+  -- obsidian
+  {
+    "epwalsh/obsidian.nvim",
+    version = "*", -- recommended, use latest release instead of latest commit
+    lazy = false,
+    ft = "markdown",
+    -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
+    -- event = {
+    --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+    --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
+    --   "BufReadPre path/to/my-vault/**.md",
+    --   "BufNewFile path/to/my-vault/**.md",
+    -- },
+    dependencies = {
+      -- Required.
+      "nvim-lua/plenary.nvim",
+      "hrsh7th/nvim-cmp",
+
+      -- see below for full list of optional dependencies 👇
+    },
+    opts = {
+      workspaces = {
+        {
+          name = "personal",
+          path = "/mnt/c/Users/jonathan_eidelman/Documents/obsidian-vault/",
+        },
+      },
+      note_id_func = function(title)
+        -- Create note IDs in a Zettelkasten format with a timestamp and a suffix.
+        -- In this case a note with the title 'My new note' will be given an ID that looks
+        -- like '1657296016-my-new-note', and therefore the file name '1657296016-my-new-note.md'
+        local suffix = ""
+        if title ~= nil then
+          -- If title is given, transform it into valid file name.
+          suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
+        else
+          suffix = 'Untitled'
+        end
+        return suffix
+      end,
+      attachments = {
+        img_folder = "/mnt/c/Users/jonathan_eidelman/Documents/obsidian-vault/assets/imgs/"
+      }
+
+      -- see below for full list of options 👇
+    },
+  },
   -- scala
   {
     "scalameta/nvim-metals",
@@ -59,6 +151,32 @@ lvim.plugins = {
       return metals_config
     end,
     config = function(self, metals_config)
+      local dap = require("dap")
+
+      dap.configurations.scala = {
+        {
+          type = "scala",
+          request = "launch",
+          name = "RunOrTest",
+          metals = {
+            runType = "runOrTestFile",
+            --args = { "firstArg", "secondArg", "thirdArg" }, -- here just as an example
+          },
+        },
+        {
+          type = "scala",
+          request = "launch",
+          name = "Test Target",
+          metals = {
+            runType = "testTarget",
+          },
+        },
+      }
+
+      metals_config.on_attach = function(client, bufnr)
+        require("metals").setup_dap()
+      end
+
       local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
       vim.api.nvim_create_autocmd("FileType", {
         pattern = self.ft,
@@ -70,6 +188,7 @@ lvim.plugins = {
     end
   },
   -- Git
+  { 'akinsho/git-conflict.nvim', version = "*", config = true },
   { 'sindrets/diffview.nvim' },
   {
     "NeogitOrg/neogit",
@@ -112,17 +231,6 @@ lvim.plugins = {
       require("scope").setup({
       })
     end
-  },
-  -- Orgmode
-  {
-    'nvim-orgmode/orgmode',
-    dependencies = {
-      { 'nvim-treesitter/nvim-treesitter', lazy = true },
-    },
-    event = 'VeryLazy',
-  },
-  {
-    'akinsho/org-bullets.nvim',
   },
   {
     'dhruvasagar/vim-table-mode'
@@ -169,17 +277,6 @@ lvim.plugins = {
   },
   {
     "szw/vim-maximizer"
-  },
-  {
-    "geg2102/nvim-python-repl",
-    dependencies = "nvim-treesitter",
-    ft = { "python", "lua", "scala" },
-    config = function()
-      require("nvim-python-repl").setup({
-        execute_on_send = true,
-        vsplit = true,
-      })
-    end
   },
   {
     "sotte/presenting.nvim",
@@ -288,15 +385,85 @@ lvim.plugins = {
       }
     },
     -- your lsp config or other stuff
+  },
+  {
+    "kylechui/nvim-surround",
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy",
+    config = function()
+      require("nvim-surround").setup({
+        -- Configuration here, or leave empty to use defaults
+      })
+    end
+  },
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    ---@type Flash.Config
+    opts = {},
+    -- stylua: ignore
+    keys = {
+      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+    },
+  },
+  {
+    'nvim-pack/nvim-spectre'
+  },
+  {
+    'stevearc/aerial.nvim',
+    opts = {},
+    -- Optional dependencies
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons"
+    },
+  },
+  {
+    'jpalardy/vim-slime'
+  },
+  {
+    'pappasam/nvim-repl'
+  },
+  {
+    'sigmasd/deno-nvim'
+  },
+  {
+    'ColaMint/pokemon.nvim'
+  },
+  {
+    "tversteeg/registers.nvim",
+    cmd = "Registers",
+    config = true,
+    keys = {
+      { "\"",    mode = { "n", "v" } },
+      { "<C-R>", mode = "i" }
+    },
+    name = "registers",
+  },
+  {
+    "junegunn/vim-easy-align"
   }
 }
+
+vim.g.repl_filetype_commands = {
+  bash = 'bash',
+  javascript = 'node',
+  python =
+  'ipython --quiet --no-autoindent',
+  sh = 'sh',
+  vim = 'nvim --clean -ERM',
+  zsh = 'zsh',
+  julia = 'julia'
+}
+--   'ipython --quiet --no-autoindent',
 -- {{ plugins }}
 
 -- {{ UI and general configs }}
 -- Set colorscheme
--- lvim.colorscheme = 'catppuccin-macchiato' -- nightfox
-lvim.colorscheme = 'everforest' -- nightfox
-vim.o.background = 'light'
+-- lvim.colorscheme = Favorites [catppuccin-macchiato, nightfox, everforest, ayu-mirage, night-owl, gruvbox-material, onedark]
+vim.o.conceallevel = 1
+lvim.colorscheme = 'everforest'
+vim.o.background = 'dark'
 -- Set lualine style
 lvim.builtin.lualine.style = "default"
 lvim.builtin.lualine.options.component_separators = ''
@@ -309,7 +476,7 @@ lvim.builtin.lualine.tabline = {
   lualine_z = { 'tabs' }
 }
 -- { left = '', right = '' }{ left = '', right = '' }
-lvim.builtin.lualine.options.section_separators = { left = '', right = '' }
+lvim.builtin.lualine.options.section_separators = { left = '', right = '' }
 -- "slant" | "slope" | "thick" | "thin"
 lvim.builtin.bufferline.options.separator_style = 'thin'
 lvim.builtin.bufferline.options.show_tab_indicators = false
@@ -319,12 +486,40 @@ vim.o.wrapmargin = 0
 vim.o.wrap = true
 vim.o.linebreak = true -- breaks by word rather than character
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-vim.opt.relativenumber = false
+vim.opt.relativenumber = true
 
 vim.o.viewoptions = "cursor,folds,slash,unix"
+vim.g.slime_target = "neovim"
 -- {{ UI and general configs }}
 
 -- {{ remaps and commands }}
+
+-- Insert a cell block and leave you inside of it in insert mode
+lvim.builtin.which_key.mappings["%"] = {
+  "O# %%<esc><CR>O# %%<esc><CR><Up>i<CR><Up>", "Insert Code Cell",
+}
+-- Open Registers popup
+lvim.builtin.which_key.mappings["R"] = {
+  "<cmd>Registers<CR>", "[R]egisters",
+}
+
+-- Aerial
+
+require("aerial").setup({
+  -- optionally use on_attach to set keymaps when aerial has attached to a buffer
+  on_attach = function(bufnr)
+  end,
+})
+lvim.builtin.which_key.mappings["a"] = {
+  "<cmd>AerialNavToggle<cr>", "Toggle [A]erial",
+}
+
+-- minimap / codewindow
+
+lvim.builtin.which_key.mappings["mm"] = {
+  "<cmd>lua require('codewindow').toggle_minimap()<cr>", "Toggle [M]inimap",
+}
+
 
 -- Hop
 local hop = require('hop')
@@ -369,7 +564,25 @@ vim.keymap.set('', 'T',
 )
 vim.keymap.set('n', 'gw', '<cmd>HopWord<cr>', { desc = "HopWord" })
 
+-- Spectre
+lvim.builtin.which_key.mappings["S"] = {
+  name = "[S]pectre",
+  s = { '<cmd>lua require("spectre").toggle()<CR>', "Open [s]pectre" },
+  w = { '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', "Current [w]ord" },
+  f = { '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>', "On current [f]ile" }
+}
+
 -- Diffview and git mappings
+lvim.builtin.which_key.mappings["gF"] = {
+  name = "Resolve con[f]licts",
+  o = { "<cmd>GitConflictChooseOurs<CR>", "Choose [o]urs" },
+  t = { "<cmd>GitConflictChooseTheirs<CR>", "Choose [t]heirs" },
+  b = { "<cmd>GitConflictChooseBoth<CR>", "Choose [b]oth" },
+  n = { "<cmd>GitConflictChooseNone<CR>", "Choose [n]either" },
+  N = { "<cmd>GitConflictNextConflict<CR>", "[N]ext conflict" },
+  P = { "<cmd>GitConflictPrevConflict<CR>", "[P]revious conflict" },
+  q = { "<cmd>GitConflictListQf<CR>", "All conflicts to [Q]uick fix" }
+}
 lvim.builtin.which_key.mappings["gv"] = {
   name = "DiffView",
   o = { "<cmd>DiffviewOpen<CR>", "DiffView Open" },
@@ -397,11 +610,6 @@ lvim.builtin.which_key.mappings["x"] = {
   "<cmd>MaximizerToggle<cr>", "Toggle Maximize"
 }
 
--- Navbuddy breadcrums
-lvim.builtin.which_key.mappings["n"] = {
-  "<cmd>lua require('nvim-navbuddy').open()<cr>", "[N]avbuddy"
-}
-
 -- Undotree
 lvim.builtin.which_key.mappings["u"] = {
   "<cmd>UndotreeToggle<cr>", "Toggle Undotree"
@@ -420,26 +628,28 @@ lvim.builtin.which_key.mappings["m"] = {
   ["l"] = { "<C-w><Right>", "Go right" }
 }
 
--- orgmode
-lvim.builtin.which_key.mappings["o"] = {
-  name = "[O]rgmode",
-  ["o"] = { "<cmd>:e ~/orgfiles/refile.org<cr>", "[O]pen refile" },
-}
+-- Obsidian
 
 -- Execute lines in V-terminal
 lvim.builtin.which_key.mappings["r"] = {
   name = " Run",
+  -- l = {
+  --   function() require('nvim-python-repl').send_statement_definition() end, "Execute Statement"
+  -- },
   l = {
-    function() require('nvim-python-repl').send_statement_definition() end, "Execute Statement"
+    '<Plug>ReplSendLine', 'Repl execute current [l]ine'
   },
-  b = {
-    function() require('nvim-python-repl').send_buffer_to_repl() end, "Execute Buffer"
-  }
+  c = {
+    '<Plug>ReplSendCell', "Repl execute [c]ell"
+  },
+  t = {
+    '<cmd>ReplToggle<CR>', "Repl [t]oggle"
+  },
 }
 
 lvim.builtin.which_key.vmappings["r"] = {
   v = {
-    function() require('nvim-python-repl').send_visual_to_repl() end, "Execute Visual Selection"
+    '<Plug>ReplSendVisual', 'Repl execute [v]isual lines'
   },
 }
 
@@ -486,22 +696,6 @@ vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
 -- {{ Plugins setup }}
 
--- {{ org mode setup }}
--- Load treesitter grammar for org
-require('nvim-treesitter.configs').setup({
-  highlight = {
-    enable = true,
-  },
-  ensure_installed = { 'org' },
-})
-require('orgmode').setup({
-  org_agenda_files = '~/orgfiles/**/*',
-  org_default_notes_file = '~/orgfiles/refile.org',
-  org_todo_keywords = { 'TODO(t)', 'DOING(d)', 'BLOCKED(b)', '|', 'DONE(x)' }
-})
-require('org-bullets').setup()
--- {{ org mode setup }}
-
 -- {{ todo comments setup }}
 require("todo-comments").setup()
 -- {{ todo comments setup }}
@@ -522,6 +716,12 @@ require("noice").setup({
     long_message_to_split = true, -- long messages will be sent to a split
     inc_rename = true,            -- enables an input dialog for inc-rename.nvim
     lsp_doc_border = false,       -- add a border to hover docs and signature help
+  },
+  routes = {
+    {
+      view = "notify",
+      filter = { event = "msg_showmode" },
+    },
   },
 })
 -- {{ noice setup }}
