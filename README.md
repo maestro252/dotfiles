@@ -3,22 +3,21 @@
 My current configuration in order to get easily up and running when setting up a new machine.
 
 - .zshrc
-- init.vim for neovim
-- .hyper.js for hyper terminal emulator
+- For neovim configuration using LazyVim, see [My LazyVim config repo](https://github.com/maestro252/lazyvim-dotfiles).
 
 ## Programs to install
 
-- Conda (miniconda)
-  - Jupyter Notebook
+- UV for python management and environments.
 - zsh
-- iterm2 / hyperjs
-  - Nerd fonts
-  - Solarized themes
-- npm
-  - ESLINT
-  - Sails
-- Brew, Cowsay, figlet, sl, tree, zsh-syntax-highlight, Neovim, Ranger
-- VSCode
-- Atom
-- Processing
+- Oh my posh, zsh prompts.
+- Atuin for command history.
+- eza for nicer ls.
+- zoxide for better cd.
+- Zellij for terminal multiplexing.
+- sdkman for java versions.
+- Mise for ruby versions.
+- Deno for javascript runtime.
+- juliaup for julia versions.
 
+# To explore later
+- Stow, for version control of all dotfiles in one repo.
