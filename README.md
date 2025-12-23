@@ -18,6 +18,7 @@ My current configuration in order to get easily up and running when setting up a
 - Mise for ruby versions.
 - Deno for javascript runtime.
 - juliaup for julia versions.
+- Yazi, file manager.
 
 # To explore later
 - Stow, for version control of all dotfiles in one repo.
