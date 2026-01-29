@@ -7,6 +7,8 @@ My current configuration in order to get easily up and running when setting up a
 
 ## Programs to install
 
+- brew for package managing. (linuxbrew).
+  Most of the utilities are installed through it if they are available.
 - UV for python management and environments.
 - zsh
 - Oh my posh, zsh prompts.
