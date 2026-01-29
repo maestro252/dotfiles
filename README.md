@@ -19,6 +19,9 @@ My current configuration in order to get easily up and running when setting up a
 - Deno for javascript runtime.
 - juliaup for julia versions.
 - Yazi, file manager.
+- wezterm for terminal.
+- jj for vcs.
+- opencode for llm agents.
 
 # To explore later
 - Stow, for version control of all dotfiles in one repo.
